@@ -240,7 +240,11 @@ export class ReportsService {
         const employees = await this.prisma.employee.findMany({
             where: employeeFilter,
             include: {
-                department: true,
+                department: {
+                    select: {
+                        fullName: true,
+                    },
+                },
                 computerUsers: {
                     include: {
                         usersOnComputers: {

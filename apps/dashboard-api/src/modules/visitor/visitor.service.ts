@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '@app/shared/database';
 import { DataScope, Role } from '@app/shared/auth';
-import { QueryBuilderUtil, PaginationDto, EncryptionUtil, QueryDto, PaginationResponseDto } from '@app/shared/utils';
+import { QueryBuilderUtil, PaginationDto, EncryptionUtil, QueryDto } from '@app/shared/utils';
 import { CreateVisitorDto, UpdateVisitorDto, GenerateCodeDto } from './dto/visitor.dto';
 import { UserContext } from '../../shared/interfaces';
+import { VisitorRepository } from './visitor.repository';
 import { Prisma } from '@prisma/client';
 // import * as QRCode from 'qrcode'; // TODO: Install qrcode package
 
 @Injectable()
 export class VisitorService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly visitorRepository: VisitorRepository
+    ) {}
 
     async findAll(query: QueryDto, scope: DataScope, user: UserContext) {
         const where: Prisma.VisitorWhereInput = {};
@@ -61,21 +65,14 @@ export class VisitorService {
             },
         };
 
-        const { page = 1, limit = 10 } = query;
-        const skip = (page - 1) * limit;
-
-        const [data, total] = await this.prisma.$transaction([
-            this.prisma.visitor.findMany({
-                where,
-                select,
-                skip,
-                take: limit,
-                orderBy: { createdAt: 'desc' },
-            }),
-            this.prisma.visitor.count({ where }),
-        ]);
-
-        return new PaginationResponseDto(data, total, page, limit);
+        return this.visitorRepository.findManyWithPagination(
+            where,
+            { createdAt: 'desc' },
+            undefined,
+            { page: query.page, limit: query.limit },
+            scope,
+            select
+        );
     }
 
     async findOne(id: number, user: UserContext) {

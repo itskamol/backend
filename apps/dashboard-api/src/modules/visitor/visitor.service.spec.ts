@@ -4,6 +4,7 @@ import { VisitorService } from './visitor.service';
 import { PrismaService } from '@app/shared/database';
 import { Role } from '@app/shared/auth';
 import { VisitorCodeType } from '@prisma/client';
+
 describe('VisitorService', () => {
     let service: VisitorService;
     let prismaService: PrismaService;
@@ -27,7 +28,6 @@ describe('VisitorService', () => {
             findMany: jest.fn(),
             count: jest.fn(),
         },
-        $transaction: jest.fn().mockImplementation((args) => Promise.resolve(args.map(arg => mockPrismaService[arg.model].findMany()))),
     };
 
     beforeEach(async () => {
@@ -58,7 +58,7 @@ describe('VisitorService', () => {
                 workPlace: 'Test Company',
             };
 
-            const user = { sub: '1', username: 'test-user', role: Role.HR, organizationId: 1 };
+            const user = { id: 1, role: Role.HR, organizationId: 1 };
 
             const expectedResult = {
                 id: 1,
@@ -69,14 +69,15 @@ describe('VisitorService', () => {
 
             mockPrismaService.visitor.create.mockResolvedValue(expectedResult);
 
-            const result = await service.create(createVisitorDto, user as any);
+            const result = await service.create(createVisitorDto, user);
 
             expect(result).toEqual(expectedResult);
             expect(mockPrismaService.visitor.create).toHaveBeenCalledWith({
                 data: {
                     ...createVisitorDto,
-                    creator: { connect: { id: parseInt(user.sub) } },
+                    creatorId: user.id,
                 },
+                select: expect.any(Object),
             });
         });
     });
@@ -91,7 +92,7 @@ describe('VisitorService', () => {
                 additionalDetails: 'Test visit',
             };
 
-            const user = { sub: '1', username: 'test-user', role: Role.HR, organizationId: 1 };
+            const user = { id: 1, role: Role.HR, organizationId: 1 };
 
             const mockVisitor = {
                 id: 1,

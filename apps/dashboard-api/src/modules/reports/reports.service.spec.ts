@@ -56,10 +56,10 @@ describe('ReportsService', () => {
             };
 
             const user = {
-                sub: '1',
-                username: 'test-user',
+                id: 1,
                 role: Role.HR,
                 organizationId: 1,
+                name: 'Test User',
             };
 
             mockPrismaService.action.groupBy.mockResolvedValue([
@@ -98,8 +98,7 @@ describe('ReportsService', () => {
             };
 
             const user = {
-                sub: '1',
-                username: 'test-user',
+                id: 1,
                 role: Role.HR,
                 organizationId: 1,
             };
@@ -145,8 +144,7 @@ describe('ReportsService', () => {
             };
 
             const user = {
-                sub: '1',
-                username: 'test-user',
+                id: 1,
                 role: Role.HR,
                 organizationId: 1,
             };
@@ -197,8 +195,7 @@ describe('ReportsService', () => {
             };
 
             const user = {
-                sub: '1',
-                username: 'test-user',
+                id: 1,
                 role: Role.HR,
                 organizationId: 1,
             };

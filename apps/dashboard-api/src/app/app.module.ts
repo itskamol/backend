@@ -34,7 +34,7 @@ import { MorganLoggerMiddleware } from '../shared/middleware';
         DepartmentModule,
         EmployeeModule,
         VisitorModule,
-        ReportsModule,
+        // ReportsModule,
         PolicyModule,
         LoggerModule
     ],
